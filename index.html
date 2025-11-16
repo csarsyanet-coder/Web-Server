@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineCraftopia - Server Minecraft Epik</title>
+    <!-- Impor Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Impor Google Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS Kustom -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #E5E7EB;
+            scroll-behavior: smooth;
+        }
+        .hero-text-gradient {
+            background: linear-gradient(to right, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-background {
+            background-color: #111827;
+            background-image: radial-gradient(#4B5563 0.5px, transparent 0.5px), radial-gradient(#4B5563 0.5px, #111827 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        .backdrop-blur-nav {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(17, 24, 39, 0.7);
+        }
+        .hover-card {
+            transition: all 0.3s ease;
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.1), 0 4px 6px -2px rgba(139, 92, 246, 0.05);
+        }
+        #copy-button {
+            transition: all 0.2s ease-in-out;
+        }
+        #copy-button:active {
+            transform: scale(0.95);
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+        }
+        .gallery-item img {
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        .gallery-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 1.5rem 1rem 1rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* CSS Perbaikan untuk Staff */
+        .skin-canvas {
+            /* Jangan set width: 100%, biarkan JS yg atur */
+            height: 300px; /* Tinggi canvas 3D */
+            margin-left: auto;
+            margin-right: auto;
+            image-rendering: pixelated; /* Menjaga tekstur pixelated */
+        }
+        .skin-fallback {
+            width: 128px; /* Ukuran fallback 2D */
+            height: 128px; /* Ukuran fallback 2D */
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header / Navigasi -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-nav border-b border-gray-700/50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div>
+                <a href="#" class="text-2xl font-bold text-white tracking-tight">
+                    Mine<span class="text-violet-400">Craftopia</span>
+                </a>
+            </div>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#home" class="text-gray-300 hover:text-violet-400 transition duration-200">Home</a>
+                <a href="#fitur" class="text-gray-300 hover:text-violet-400 transition duration-200">Fitur</a>
+                <a href="#galeri" class="text-gray-300 hover:text-violet-400 transition duration-200">Galeri</a>
+                <a href="#staff" class="text-gray-300 hover:text-violet-400 transition duration-200">Staff</a>
+                <a href="#aturan" class="text-gray-300 hover:text-violet-400 transition duration-200">Aturan</a>
+                <a href="#" class="bg-violet-600 hover:bg-violet-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                    Vote
+                </a>
+            </div>
+            <div class="md:hidden">
+                <button class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Section 1: Hero -->
+    <section id="home" class="min-h-screen flex items-center justify-center hero-background pt-20">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-3xl mx-auto">
+                <div id="server-status-container" class="inline-block bg-gray-800 border border-gray-700 rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 mb-4">
+                    <span id="status-dot" class="inline-block w-2.5 h-2.5 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
+                    <span id="status-text">Mengecek status server...</span>
+                    <span id="player-count" class="font-bold text-white"></span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4">
+                    Temukan Dunia <span class="hero-text-gradient">Tak Terbatas</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+                    Bergabunglah dengan <span class="font-bold text-white">MineCraftopia</span>. Server survival, ekonomi kustom, event mingguan, dan komunitas yang aktif menantimu.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#join" class="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 transform hover:scale-105">
+                        Cara Bergabung
+                    </a>
+                    <a href="#" class="w-full sm:w-auto bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
+                        Gabung Discord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Fitur Unggulan -->
+    <section id="fitur" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-3">Fitur Unggulan Kami</h2>
+                <p class="text-lg text-gray-400">Apa yang membuat kami berbeda dari yang lain.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Kartu Fitur (Gunakan .hover-card) -->
+                <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 hover-card">
+                    <div class="w-12 h-12 bg-violet-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343m11.314 11.314A8 8 0 005.025 9.025M15.898 21.898A8 8 0 018.102 14.102m7.796 7.796A8 8 0 0021.898 8.102"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Ekonomi Kustom</h3>
+                    <p class="text-gray-400">Sistem ekonomi yang seimbang dengan toko pemain, pekerjaan, dan item kustom yang unik.</p>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 hover-card">
+                    <div class="w-12 h-12 bg-violet-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Perlindungan Grief</h3>
+                    <p class="text-gray-400">Amankan tanah dan bangunanmu dengan sistem proteksi canggih kami. Main dengan tenang!</p>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 hover-card">
+                    <div class="w-12 h-12 bg-violet-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Dunia Survival Baru</h3>
+                    <p class="text-gray-400">Jelajahi dunia yang baru di-reset dengan bioma kustom dan struktur dungeon yang menantang.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Cara Bergabung (Join) -->
+    <section id="join" class="py-20 bg-gray-800 border-t border-b border-gray-700">
+        <div class="container mx-auto px-6">
+            <div class="bg-gray-900 rounded-2xl shadow-xl p-8 md:p-12 lg:flex items-center justify-between gap-8">
+                <div class="lg:w-1/2 mb-8 lg:mb-0">
+                    <h2 class="text-4xl font-bold text-white mb-3">Siap untuk Bertualang?</h2>
+                    <p class="text-lg text-gray-400 mb-6">Bergabung itu mudah. Cukup salin alamat IP di bawah ini. Kami mendukung Java & Bedrock!</p>
+                    <div class="text-base text-gray-400">
+                        <p><strong>Java IP:</strong> <span id="java-ip-text">prm.arsyanet.my.id:19280</span></p>
+                        <p><strong>Bedrock IP:</strong> <span id="bedrock-ip-text">bedrock.minecraftopia.com</span> | <strong>Port:</strong> 19132</p>
+                    </div>
+                </div>
+                <div class="lg:w-1/2">
+                    <p class="text-sm font-medium text-violet-400 mb-2">SALIN IP (JAVA)</p>
+                    <div class="flex">
+                        <input id="server-ip-input" type="text" class="w-full bg-gray-800 border border-gray-700 text-white text-lg sm:text-xl font-mono rounded-l-lg px-4 py-3 focus:outline-none" value="prm.arsyanet.my.id:19280" readonly>
+                        <button id="copy-button" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-r-lg text-lg transition duration-300">
+                            Salin
+                        </button>
+                    </div>
+                    <p id="copy-feedback" class="text-green-400 text-sm mt-2 h-5"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Section 4: Galeri Server -->
+    <section id="galeri" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-3">Galeri Server</h2>
+                <p class="text-lg text-gray-400">Lihatlah beberapa momen dan bangunan epik di server kami.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ganti 'src' dengan URL gambar Anda -->
+                <a href="#" class="gallery-item group">
+                    <img src="https://placehold.co/800x600/1e1b4b/93c5fd?text=Spawn+Area" alt="Spawn Area Server" class="w-full h-64 object-cover">
+                    <div class="gallery-item-overlay">
+                        <h3 class="text-xl font-bold text-white">Spawn Area</h3>
+                    </div>
+                </a>
+                <a href="#" class="gallery-item group">
+                    <img src="https://placehold.co/800x600/7f1d1d/fca5a5?text=Arena+PvP" alt="Arena PvP" class="w-full h-64 object-cover">
+                    <div class="gallery-item-overlay">
+                        <h3 class="text-xl font-bold text-white">Arena PvP</h3>
+                    </div>
+                </a>
+                <a href="#" class="gallery-item group">
+                    <img src="https://placehold.co/800x600/064e3b/6ee7b7?text=Pasar+Pemain" alt="Pasar Pemain" class="w-full h-64 object-cover">
+                    <div class="gallery-item-overlay">
+                        <h3 class="text-xl font-bold text-white">Pasar Pemain</h3>
+                    </div>
+                </a>
+                <a href="#" class="gallery-item group">
+                    <img src="https://placehold.co/800x600/7c2d12/fdba74?text=Event+Parkour" alt="Event Parkour" class="w-full h-64 object-cover">
+                    <div class="gallery-item-overlay">
+                        <h3 class="text-xl font-bold text-white">Event Parkour</h3>
+                    </div>
+                </a>
+                <a href="#" class="gallery-item group">
+                    <img src="https://placehold.co/800x600/1d4ed8/93c5fd?text=Base+Player" alt="Base Player" class="w-full h-64 object-cover">
+                    <div class="gallery-item-overlay">
+                        <h3 class="text-xl font-bold text-white">Karya Pemain</h3>
+                    </div>
+                </a>
+                <a href="#" class="gallery-item group">
+                    <img src="https://placehold.co/800x600/581c87/e9d5ff?text=Dungeon+Kustom" alt="Dungeon Kustom" class="w-full h-64 object-cover">
+                    <div class="gallery-item-overlay">
+                        <h3 class="text-xl font-bold text-white">Dungeon Kustom</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Tim Staff (DENGAN FALLBACK 2D) -->
+    <section id="staff" class="py-20 bg-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-3">Tim Staff Kami</h2>
+                <p class="text-lg text-gray-400">Orang-orang di balik layar yang membuat server tetap berjalan.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Kartu Staff 1: Owner -->
+                <div class="bg-gray-900 rounded-xl p-6 shadow-lg border border-gray-700 text-center hover-card">
+                    <!-- Canvas 3D (Akan disembunyikan jika gagal) -->
+                    <canvas id="skin-owner" class="skin-canvas mx-auto rounded-lg"></canvas>
+                    <!-- Fallback 2D (Akan ditampilkan jika 3D gagal) -->
+                    <img id="skin-owner-fallback" alt="Skin Owner" class="skin-fallback hidden mx-auto rounded-lg mb-4">
+                    <h3 id="name-owner" class="text-2xl font-bold text-white mt-4">Memuat...</h3>
+                    <p class="text-violet-400 font-semibold text-lg">OWNER</p>
+                </div>
+                
+                <!-- Kartu Staff 2: Admin -->
+                <div class="bg-gray-900 rounded-xl p-6 shadow-lg border border-gray-700 text-center hover-card">
+                    <canvas id="skin-admin" class="skin-canvas mx-auto rounded-lg"></canvas>
+                    <img id="skin-admin-fallback" alt="Skin Admin" class="skin-fallback hidden mx-auto rounded-lg mb-4">
+                    <h3 id="name-admin" class="text-2xl font-bold text-white mt-4">Memuat...</h3>
+                    <p class="text-pink-400 font-semibold text-lg">ADMIN</p>
+                </div>
+                
+                <!-- Kartu Staff 3: Moderator -->
+                <div class="bg-gray-900 rounded-xl p-6 shadow-lg border border-gray-700 text-center hover-card">
+                    <canvas id="skin-moderator" class="skin-canvas mx-auto rounded-lg"></canvas>
+                    <img id="skin-moderator-fallback" alt="Skin Moderator" class="skin-fallback hidden mx-auto rounded-lg mb-4">
+                    <h3 id="name-mod" class="text-2xl font-bold text-white mt-4">Memuat...</h3>
+                    <p class="text-cyan-400 font-semibold text-lg">MODERATOR</p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Aturan Server -->
+    <section id="aturan" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-3">Aturan Server</h2>
+                <p class="text-lg text-gray-400">Mohon patuhi untuk menjaga komunitas tetap asyik.</p>
+            </div>
+            <div class="max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6 md:p-8">
+                <ul class="space-y-4">
+                    <li class="flex items-start space-x-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-green-900 font-bold text-sm">✓</span>
+                        <span class="text-gray-300">Dilarang griefing, mencuri, atau merusak properti pemain lain.</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-green-900 font-bold text-sm">✓</span>
+                        <span class="text-gray-300">Gunakan bahasa yang sopan. Dilarang SARA, toxic, atau spamming.</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-green-900 font-bold text-sm">✓</span>
+                        <span class="text-gray-300">Dilarang menggunakan cheat, hack, x-ray, atau mod yang tidak diizinkan.</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-red-900 font-bold text-sm">!</span>
+                        <span class="text-gray-400">Aturan selengkapnya ada di <a href="#" class="text-violet-400 hover:underline">Discord</a>.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-700/50 py-10">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <p>&copy; 2025 MineCraftopia. Dibuat dengan ❤️ untuk komunitas.</p>
+            <p class="text-sm mt-1">Kami tidak berafiliasi dengan Mojang AB atau Microsoft.</p>
+        </div>
+    </footer>
+
+    <!-- Impor Library 3D Skin Viewer -->
+    <script src="https://cdn.jsdelivr.net/npm/skinview3d@2.1.0/dist/skinview3d.bundle.js"></script>
+
+    <!-- JavaScript Kustom -->
+    <script>
+        // --- KONFIGURASI (UBAH INI) ---
+        const serverIpAddress = "prm.arsyanet.my.id:19280"; // Ganti dengan IP server Java Anda
+        const bedrockIpAddress = "bedrock.minecraftopia.com"; // Ganti dengan IP server Bedrock Anda
+        const bedrockPort = 19132;
+
+        // Username Staff (Ganti dengan username Minecraft Anda)
+        const ownerUsername = "Diii3028"; 
+        const adminUsername = "jeb_"; 
+        const modUsername = "MHF_Villager"; // (MHF_ "skin" adalah placeholder yg bagus)
+        // ------------------------------
+
+        // --- Fungsi untuk menyalin IP ---
+        function copyIpAddress() {
+            const copyText = document.getElementById('server-ip-input');
+            const feedback = document.getElementById('copy-feedback');
+            const button = document.getElementById('copy-button');
+            
+            // Gunakan API Clipboard modern
+            navigator.clipboard.writeText(copyText.value).then(function() {
+                feedback.textContent = 'Berhasil disalin ke clipboard!';
+                feedback.classList.remove('text-red-400');
+                feedback.classList.add('text-green-400');
+                button.textContent = 'Disalin!';
+                button.classList.remove('bg-violet-600', 'hover:bg-violet-700');
+                button.classList.add('bg-green-600', 'cursor-not-allowed');
+                
+                setTimeout(function() {
+                    feedback.textContent = '';
+                    button.textContent = 'Salin';
+                    button.classList.remove('bg-green-600', 'cursor-not-allowed');
+                    button.classList.add('bg-violet-600', 'hover:bg-violet-700');
+                }, 3000);
+            }, function(err) {
+                // Fallback jika API clipboard gagal
+                try {
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = copyText.value;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    
+                    // Panggil fungsi lagi untuk feedback (setelah berhasil copy)
+                    copyIpAddress(); 
+                } catch (e) {
+                    feedback.textContent = 'Gagal menyalin. Salin manual.';
+                    feedback.classList.remove('text-green-400');
+                    feedback.classList.add('text-red-400');
+                }
+            });
+        }
+        
+        // --- Fungsi untuk mengambil status server ---
+        async function fetchServerStatus() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            const playerCount = document.getElementById('player-count');
+
+            try {
+                // Gunakan API mcsrvstat.us (lebih baru dari mcapi.us)
+                const response = await fetch(`https://api.mcsrvstat.us/3/${serverIpAddress}`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data server');
+                }
+                const data = await response.json();
+
+                if (data.online) {
+                    statusDot.classList.remove('bg-yellow-500', 'bg-red-500', 'animate-pulse');
+                    statusDot.classList.add('bg-green-500');
+                    statusText.textContent = 'Server Online:';
+                    playerCount.textContent = `${data.players.online}/${data.players.max}`;
+                } else {
+                    statusDot.classList.remove('bg-yellow-500', 'bg-green-500', 'animate-pulse');
+                    statusDot.classList.add('bg-red-500');
+                    statusText.textContent = 'Server Offline';
+                    playerCount.textContent = '';
+                }
+            } catch (error) {
+                console.error('Error fetching server status:', error);
+                statusDot.classList.remove('bg-yellow-500', 'bg-green-500', 'animate-pulse');
+                statusDot.classList.add('bg-red-500');
+                statusText.textContent = 'Gagal memuat status';
+                playerCount.textContent = '';
+            }
+        }
+        
+        // --- Fungsi untuk memuat 3D Skin (DENGAN FALLBACK) ---
+        function initializeSkinViewers() {
+            try {
+                // Cek jika library skinview3d ada dan tidak terblokir
+                if (typeof skinview3d === 'undefined') {
+                    throw new Error("Library skinview3d tidak ditemukan atau diblokir.");
+                }
+        
+                // Skin Owner
+                let skinViewerOwner = new skinview3d.SkinViewer({
+                    canvas: document.getElementById("skin-owner"),
+                    width: 250, // Lebar render 3D
+                    height: 300, // Tinggi render 3D
+                    skin: ownerUsername
+                });
+                skinViewerOwner.loadSkin(ownerUsername);
+                skinViewerOwner.animation = new skinview3d.WalkingAnimation();
+                skinViewerOwner.animation.speed = 0.5;
+
+                // Skin Admin
+                let skinViewerAdmin = new skinview3d.SkinViewer({
+                    canvas: document.getElementById("skin-admin"),
+                    width: 250,
+                    height: 300,
+                    skin: adminUsername
+                });
+                skinViewerAdmin.loadSkin(adminUsername);
+                skinViewerAdmin.animation = new skinview3d.RunningAnimation();
+                skinViewerAdmin.animation.speed = 0.8;
+
+                // Skin Moderator
+                let skinViewerMod = new skinview3d.SkinViewer({
+                    canvas: document.getElementById("skin-moderator"),
+                    width: 250,
+                    height: 300,
+                    skin: modUsername
+                });
+                skinViewerMod.loadSkin(modUsername);
+                skinViewerMod.animation = new skinview3d.IdleAnimation();
+
+            } catch (error) {
+                // --- INI ADALAH BAGIAN FALLBACK ---
+                console.error("Gagal memuat 3D Skin Viewer:", error);
+                console.warn("Menampilkan fallback 2D (avatar) sebagai gantinya.");
+
+                // Daftar staff untuk fallback
+                const staffList = [
+                    { id: "owner", username: ownerUsername, fallbackId: "skin-owner-fallback", canvasId: "skin-owner" },
+                    { id: "admin", username: adminUsername, fallbackId: "skin-admin-fallback", canvasId: "skin-admin" },
+                    { id: "moderator", username: modUsername, fallbackId: "skin-moderator-fallback", canvasId: "skin-moderator" }
+                ];
+
+                staffList.forEach(staff => {
+                    const canvas = document.getElementById(staff.canvasId);
+                    const fallback = document.getElementById(staff.fallbackId);
+                    
+                    if (canvas) canvas.style.display = 'none'; // Sembunyikan canvas 3D yg error
+                    if (fallback) {
+                        // Tampilkan elemen fallback 2D
+                        fallback.classList.remove('hidden');
+                        // Set sumber gambar ke avatar 2D
+                        fallback.src = `https://crafatar.com/avatars/${staff.username}?size=128&overlay=true&default=MHF_Steve`;
+                    }
+                });
+            }
+        }
+        
+        // --- Jalankan semua fungsi saat DOM selesai dimuat ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pasang event listener untuk tombol salin
+            document.getElementById('copy-button').addEventListener('click', copyIpAddress);
+            
+            // Atur IP di tempat yang relevan
+            document.getElementById('java-ip-text').textContent = serverIpAddress;
+            document.getElementById('server-ip-input').value = serverIpAddress;
+            document.getElementById('bedrock-ip-text').textContent = bedrockIpAddress;
+
+            // Ambil status server saat memuat halaman
+            fetchServerStatus();
+            // Perbarui status server setiap 60 detik
+            setInterval(fetchServerStatus, 60000);
+            
+            // Set nama staff di kartu
+            document.getElementById('name-owner').textContent = ownerUsername;
+            document.getElementById('name-admin').textContent = adminUsername;
+            document.getElementById('name-mod').textContent = modUsername;
+            
+            // Muat 3D skin staff (dengan fallback)
+            initializeSkinViewers();
+        });
+    </script>
+
+</body>
+</html>
