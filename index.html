@@ -9,7 +9,192 @@
     <!-- Impor Google Font (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+            color: #E5E7EB; /* text-gray-200 */
+            overflow-x: hidden; /* Mencegah horizontal scroll karena animasi */
+        }
+        .hero-text-gradient {
+            background: linear-gradient(to right, #8B5CF6, #EC4899); /* gradien violet ke pink */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-background {
+            background-color: #111827; /* bg-gray-900 */
+            background-image: radial-gradient(#4B5563 0.5px, transparent 0.5px), radial-gradient(#4B5563 0.5px, #111827 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        .backdrop-blur-nav {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(17, 24, 39, 0.7); /* bg-gray-900/70 */
+        }
+        
+        /* --- DUA JENIS ANIMASI KARTU --- */
+
+        /* 1. Animasi "LIFT" (Terangkat) untuk Fitur & Staff - DIKEMBALIKAN */
+        .hover-card-lift {
+            will-change: transform, box-shadow;
+        }
+        .hover-card-lift.is-visible:hover {
+            transform: translateY(-8px) scale(1.03); 
+            box-shadow: 0 18px 30px -5px rgba(139, 92, 246, 0.25),
+                        0 10px 15px -6px rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.6); 
+        }
+        .hover-card-lift.is-visible:active {
+            transform: translateY(-2px) scale(0.98); 
+            transition-duration: 0.1s; 
+        }
+
+
+        /* 2. Animasi "POP" (Timbul/Scale) untuk Shop Rank */
+        .hover-card-pop {
+            will-change: transform, box-shadow;
+        }
+        .hover-card-pop.is-visible:hover {
+            transform: scale(1.05); /* <-- Animasi seperti tombol */
+            box-shadow: 0 18px 30px -5px rgba(139, 92, 246, 0.25),
+                        0 10px 15px -6px rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.6); 
+        }
+        .hover-card-pop.is-visible:active {
+            transform: scale(0.98); /* Efek klik */
+            transition-duration: 0.1s; /* Hanya butuh durasi, properti diwarisi */
+        }
+        /* --- AKHIR PERUBAHAN ANIMASI KARTU --- */
+
+        #copy-button {
+            transition: all 0.2s ease-in-out;
+        }
+        #copy-button:active {
+            transform: scale(0.95);
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .gallery-item img {
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        .gallery-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 1.5rem 1rem 1rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* CSS untuk Skin 2D */
+        .skin-render {
+            height: 256px; /* h-64 */
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 1rem; /* mb-4 */
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+        /* CSS untuk Avatar Fallback */
+        .skin-fallback {
+            width: 128px;
+            height: 128px;
+            image-rendering: pixelated;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 1rem;
+        }
+        
+        /* --- CSS ANIMASI (Scroll) --- */
+        
+        /* PERUBAHAN 1: Menggunakan variabel --animation-transform */
+        .animate-on-scroll {
+            opacity: 0;
+            /* Gunakan variabel untuk transform, default ke translateY(30px) */
+            transform: var(--animation-transform, translateY(30px)); 
+            
+            /* Transisi HANYA untuk scroll-in */
+            transition: opacity 0.8s ease-out var(--animation-delay, 0s), 
+                        transform 0.8s ease-out var(--animation-delay, 0s);
+                        
+            will-change: opacity, transform;
+        }
+        
+        /* PERUBAHAN 2: Menggunakan 'transform: none' agar mereset SEMUA (scale, translate, dll) */
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: none; /* <-- DIUBAH DARI translateY(0) */
+            
+            /* Transisi CEPAT untuk hover, ditambahkan SETELAH elemen terlihat */
+            /* Ini akan digunakan oleh .hover-card-pop DAN .hover-card-lift */
+            transition: opacity 0.8s ease-out, 
+                        transform 0.3s ease-out, /* <-- Ini untuk hover */
+                        box-shadow 0.3s ease-out, /* <-- Ini untuk hover */
+                        border-color 0.3s ease-out; /* <-- Ini untuk hover */
+        }
+
+        /* --- CSS Animasi Mengetik --- */
+        #server-ip-input {
+            caret-color: #8B5CF6; /* Warna kursor ungu */
+            border-right: 2px solid transparent; /* Placeholder untuk 'kursor' */
+        }
+
+        /* --- PERUBAHAN ANIMASI MENU MOBILE --- */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            /* Transisi untuk 'max-height' (animasi dropdown) */
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        #mobile-menu.menu-is-open {
+            max-height: 500px; /* Atur ke nilai yang cukup besar */
+        }
+        
+        /* Animasi untuk ikon hamburger/close */
+        #mobile-menu-toggle {
+            transition: transform 0.3s ease;
+        }
+        #mobile-menu-toggle .icon-menu,
+        #mobile-menu-toggle .icon-close {
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        
+        /* State Awal (Menu Tertutup) */
+        #mobile-menu-toggle .icon-close {
+            transform: rotate(90deg) scale(0.5);
+            opacity: 0;
+        }
+        
+        /* State Akhir (Menu Terbuka) */
+        #mobile-menu-toggle.menu-open .icon-menu {
+            transform: rotate(90deg) scale(0.5);
+            opacity: 0;
+        }
+        #mobile-menu-toggle.menu-open .icon-close {
+            transform: rotate(0deg) scale(1);
+            opacity: 1;
+        }
+        /* --- AKHIR PERUBAHAN --- */
+
+    </style>
 </head>
 <body class="antialiased">
 
@@ -17,7 +202,7 @@
     <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-nav border-b border-gray-700/50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2">
-    <img src="https://s3.ezgif.com/tmp/ezgif-3c0c4093c0a2edb4.png" 
+    <img src="/logo.png" 
          alt="Logo" 
          class="w-8 h-8 rounded-lg">
          
@@ -509,13 +694,307 @@
 
     
     <!-- JavaScript Kustom -->
-    
+    <script>
+        // --- KONFIGURASI (UBAH INI) ---
+        const serverIpAddress = "play.arsyanetwork.my.id";
+        const bedrockIpAddress = "bd.arsyanetwork.my.id";
+        const bedrockPort = 19132;
 
-    
+        const ownerUsername = "Diii3028"; 
+        const adminUsername = "Kumasama"; 
+        const modUsername = "Namika"; 
+        // ------------------------------
 
-    
+        // --- Fungsi untuk menyalin IP ---
+        function copyIpAddress() {
+            const copyText = document.getElementById('server-ip-input');
+            const feedback = document.getElementById('copy-feedback');
+            const button = document.getElementById('copy-button');
+            
+            // PERUBAHAN: Selalu pastikan nilainya adalah IP penuh sebelum menyalin
+            copyText.value = serverIpAddress; 
+            
+            navigator.clipboard.writeText(copyText.value).then(function() {
+                // Sukses (Modern)
+                feedback.textContent = 'Berhasil disalin ke clipboard!';
+                feedback.classList.remove('text-red-400');
+                feedback.classList.add('text-green-400');
+                button.textContent = 'Disalin!';
+                button.classList.remove('bg-violet-600', 'hover:bg-violet-700');
+                button.classList.add('bg-green-600', 'cursor-not-allowed');
+                
+                setTimeout(function() {
+                    feedback.textContent = '';
+                    button.textContent = 'Salin';
+                    button.classList.remove('bg-green-600', 'cursor-not-allowed');
+                    button.classList.add('bg-violet-600', 'hover:bg-violet-700');
+                }, 3000);
+            }, function(err) {
+                // Gagal (Coba Fallback)
+                try {
+                    // Fallback untuk browser lama / iframe
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = serverIpAddress; // Pastikan fallback juga menyalin IP penuh
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    
+                    // Panggil ulang untuk feedback visual
+                    feedback.textContent = 'Berhasil disalin (fallback)!';
+                    feedback.classList.add('text-green-400');
+                    button.textContent = 'Disalin!';
+                    button.classList.add('bg-green-600');
 
-    
+                    // Reset setelah 3 detik
+                    setTimeout(function() {
+                        feedback.textContent = '';
+                        button.textContent = 'Salin';
+                        button.classList.remove('bg-green-600', 'cursor-not-allowed');
+                        button.classList.add('bg-violet-600', 'hover:bg-violet-700');
+                    }, 3000);
 
-    <script src="js/script.js"></script>\n</body>
+                } catch (e) {
+                    feedback.textContent = 'Gagal menyalin. Salin manual.';
+                    feedback.classList.remove('text-green-400');
+                    feedback.classList.add('text-red-400');
+                }
+            });
+        }
+        
+        // --- Fungsi untuk mengambil status server ---
+        async function fetchServerStatus() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            const playerCount = document.getElementById('player-count');
+
+            try {
+                const response = await fetch(`https://api.mcsrvstat.us/3/${serverIpAddress}`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data server');
+                }
+                const data = await response.json();
+
+                if (data.online) {
+                    statusDot.classList.remove('bg-yellow-500', 'bg-red-500', 'animate-pulse');
+                    statusDot.classList.add('bg-green-500');
+                    statusText.textContent = 'Server Online:';
+                    playerCount.textContent = `${data.players.online}/${data.players.max}`;
+                } else {
+                    statusDot.classList.remove('bg-yellow-500', 'bg-green-500', 'animate-pulse');
+                    statusDot.classList.add('bg-red-500');
+                    statusText.textContent = 'Server Offline';
+                    playerCount.textContent = '';
+                }
+            } catch (error) {
+                console.error('Error fetching server status:', error);
+                statusDot.classList.remove('bg-yellow-500', 'bg-green-500', 'animate-pulse');
+                statusDot.classList.add('bg-red-500');
+                statusText.textContent = 'Gagal memuat status';
+                playerCount.textContent = '';
+            }
+        }
+        
+        // --- Fungsi untuk Smooth Scroll ---
+        function addSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId && targetId !== '#') {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            e.preventDefault();
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+        
+        // --- Fungsi untuk memuat skin 2D ---
+        function load2DSkins() {
+            const staffList = [
+                { id: "owner", username: ownerUsername, imgId: "skin-owner-img" },
+                { id: "admin", username: adminUsername, imgId: "skin-admin-img" },
+                { id: "moderator", username: modUsername, imgId: "skin-mod-img" }
+            ];
+
+            staffList.forEach(staff => {
+                const imgElement = document.getElementById(staff.imgId);
+                if (imgElement) {
+                    const primaryUrl = `https://visage.surgeplay.com/full/256/${staff.username}`;
+                    const fallbackUrl = `https://crafatar.com/renders/body/${staff.username}?overlay=true&default=MHF_Steve`;
+                    const avatarFallback = `https://crafatar.com/avatars/${staff.username}?size=128&overlay=true&default=MHF_Steve`;
+
+                    imgElement.src = primaryUrl; 
+                    imgElement.alt = `Skin ${staff.username}`;
+                    
+                    imgElement.onerror = () => {
+                        console.warn(`Gagal memuat skin dari Visage for ${staff.username}. Mencoba Crafatar...`);
+                        imgElement.src = fallbackUrl;
+                        
+                        imgElement.onerror = () => {
+                             console.error(`Gagal memuat skin dari Crafatar juga for ${staff.username}. Menampilkan avatar.`);
+                             imgElement.src = avatarFallback;
+                             imgElement.classList.add('skin-fallback');
+                             imgElement.classList.remove('skin-render');
+                        };
+                    };
+                }
+            });
+        }
+
+        // --- Fungsi untuk Animasi Scroll ---
+        function addScrollAnimation() {
+            const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+            
+            // Fallback untuk browser lama
+            if (!('IntersectionObserver' in window)) {
+                elementsToAnimate.forEach(el => {
+                    el.classList.add('is-visible');
+                });
+                return;
+            }
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Hanya animasikan sekali
+                    }
+                });
+            }, {
+                threshold: 0.1 // Muncul saat 10% elemen terlihat
+            });
+
+            elementsToAnimate.forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // --- PERBAIKAN: Fungsi Animasi Mengetik IP (yang hilang) ---
+        const typingIpTarget = serverIpAddress; // IP yang akan diketik
+        let typingElement = null; // AKAN DIISI OLEH DOMCONTENTLOADED
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeIpAnimation() {
+            const currentString = typingIpTarget;
+            let displayText = '';
+            let typingSpeed = isDeleting ? 50 : 120; // Kecepatan default
+
+            // Pengecekan jika elemen belum di-load
+            if (!typingElement) {
+                console.warn("Animasi mengetik IP dibatalkan: elemen #server-ip-input tidak ditemukan.");
+                return; 
+            }
+
+            if (isDeleting) {
+                // Proses menghapus
+                displayText = currentString.substring(0, charIndex - 1);
+                typingElement.value = displayText; 
+                charIndex--;
+
+                if (charIndex === 0) {
+                    isDeleting = false;
+                    typingSpeed = 1000; // Jeda setelah selesai hapus
+                }
+            } else {
+                // Proses mengetik
+                displayText = currentString.substring(0, charIndex + 1);
+                typingElement.value = displayText; 
+                charIndex++;
+
+                if (charIndex === currentString.length) {
+                    isDeleting = true;
+                    typingSpeed = 4000; // Jeda setelah selesai ketik
+                }
+            }
+            
+            // Panggil timeout dengan kecepatan yang disesuaikan
+            setTimeout(typeIpAnimation, typingSpeed);
+        }
+        // --- AKHIR PERBAIKAN ---
+
+        
+        // --- Gunakan 'DOMContentLoaded' ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pasang event listener
+            document.getElementById('copy-button').addEventListener('click', copyIpAddress);
+            addSmoothScroll();
+            addScrollAnimation(); // Jalankan fungsi animasi scroll
+            
+            // Atur IP
+            document.getElementById('java-ip-text').textContent = serverIpAddress;
+            document.getElementById('bedrock-ip-text').textContent = bedrockIpAddress;
+
+            // Ambil status server
+            fetchServerStatus();
+            setInterval(fetchServerStatus, 60000); // Cek status tiap 1 menit
+            
+            // Set nama staff
+            document.getElementById('name-owner').textContent = ownerUsername;
+            document.getElementById('name-admin').textContent = adminUsername;
+            document.getElementById('name-mod').textContent = modUsername;
+            
+            // Muat skin 2D
+            load2DSkins();
+
+            // --- PERBAIKAN: Inisialisasi 'typingElement' DI DALAM SINI ---
+            typingElement = document.getElementById('server-ip-input');
+            
+            // MULAI Animasi Mengetik IP
+            setTimeout(typeIpAnimation, 1500); // Mulai setelah jeda 1.5 detik
+
+            // --- Logika Toggle Menu Mobile ---
+            const menuButton = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+            if (menuButton && mobileMenu) {
+                // 1. Buka/Tutup menu saat tombol hamburger diklik
+                menuButton.addEventListener('click', function() {
+                    // Toggle class di menu untuk animasi max-height
+                    const isOpen = mobileMenu.classList.toggle('menu-is-open');
+                    // Toggle class di tombol untuk animasi ikon
+                    menuButton.classList.toggle('menu-open', isOpen);
+                });
+
+                // 2. Tutup menu saat salah satu link di dalamnya diklik
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.remove('menu-is-open');
+                        menuButton.classList.remove('menu-open'); // Reset ikon
+                    });
+                });
+            }
+        });
+    </script>
+
+    <script>
+    document.querySelectorAll("img").forEach(img => {
+        img.setAttribute("draggable", false);
+    });
+    </script>
+
+    <script>
+    document.addEventListener('keydown', event => {
+        if (
+        (event.ctrlKey && ['s', 'u', 'c', 'p'].includes(event.key.toLowerCase())) || // Ctrl+S, Ctrl+U, Ctrl+C, Ctrl+P
+        event.key === 'F12' || 
+        (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i') // Ctrl+Shift+I
+        ) {
+        event.preventDefault();
+        alert('Fitur ini dinonaktifkan untuk keamanan konten.');
+        }
+    });
+    </script>
+
+    <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+
+</body>
 </html>
